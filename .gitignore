@@ -1,31 +1,12 @@
-# Python
-__pycache__/
+# Python Virtual Environment
+backend/venv/
+
+# Python Cache
+_pycache_/
 *.pyc
-*.pyo
-*.pyd
-.venv/
 
-# Environment
-.env
-
-# Node
+# Node Modules
 node_modules/
 
-# Build
-dist/
-build/
-
-# VS Code
-.vscode/
-
-# Mac
-.DS_Store
-
-# Logs
-*.log
-
-# ChromaDB
-chroma_db/
-
-# Docker
-*.pid
+# Environment Variables
+.env
