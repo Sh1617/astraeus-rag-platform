@@ -31,7 +31,12 @@ def chunk_text(text):
     return chunks
 
 
+
+
 def generate_answer(query, context_chunks):
+
+    if not context_chunks:
+        return "No relevant context found."
 
     context = "\n\n".join(context_chunks)
 
@@ -45,14 +50,25 @@ def generate_answer(query, context_chunks):
     {query}
     """
 
-    response = ollama.chat(
+    stream = ollama.chat(
         model="llama3",
         messages=[
             {
                 "role": "user",
                 "content": prompt
             }
-        ]
+        ],
+        stream=True
     )
 
-    return response["message"]["content"]
+    final_response = ""
+
+    for chunk in stream:
+
+        content = chunk["message"]["content"]
+
+        final_response += content
+
+        print(content, end="", flush=True)
+
+    return final_response
