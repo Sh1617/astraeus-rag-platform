@@ -62,15 +62,21 @@ async def upload_file(file: UploadFile = File(...)):
     }
 
 @app.post("/query")
-async def query_documents(question: str):
+async def query_documents(
+    question: str,
+    session_id: str = "default_user"
+):
 
     result = app_graph.invoke({
+        "session_id": session_id,
         "question": question
     })
 
     return {
+    "session_id": session_id,
     "question": question,
     "answer": result["answer"],
     "retrieved_chunks": result["retrieved_chunks"],
-    "verification": result["verification"]
+    "verification": result["verification"],
+    "tool_result": result["tool_result"]
     }
