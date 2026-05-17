@@ -69,7 +69,8 @@ async def query_documents(question: str):
     })
 
     return {
-        "question": question,
-        "answer": result["answer"],
-        "retrieved_chunks": result["retrieved_chunks"]
+    "question": question,
+    "answer": result["answer"],
+    "retrieved_chunks": result["retrieved_chunks"],
+    "verification": result["verification"]
     }
