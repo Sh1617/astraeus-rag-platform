@@ -1,0 +1,38 @@
+from typing import TypedDict
+
+from langgraph.graph import StateGraph, END
+
+from agents.memory_agent.memory_agent import memory_agent
+from agents.retrieval_agent.retrieval_agent import retrieval_agent
+from agents.research_agent.research_agent import research_agent
+
+
+class AgentState(TypedDict):
+
+    question: str
+    retrieved_chunks: list
+    answer: str
+    memory: list
+
+
+graph = StateGraph(AgentState)
+
+# Add agents
+graph.add_node("memory_agent", memory_agent)
+
+graph.add_node("retrieval_agent", retrieval_agent)
+
+graph.add_node("research_agent", research_agent)
+
+# Entry point
+graph.set_entry_point("memory_agent")
+
+# Workflow
+graph.add_edge("memory_agent", "retrieval_agent")
+
+graph.add_edge("retrieval_agent", "research_agent")
+
+graph.add_edge("research_agent", END)
+
+# Compile graph
+app_graph = graph.compile()

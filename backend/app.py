@@ -11,6 +11,7 @@ from rag_pipeline import extract_text_from_pdf, chunk_text
 from embedder import generate_embedding
 from retriever import store_chunk
 
+from agents.orchestrator.graph import app_graph
 
 app = FastAPI()
 
@@ -63,17 +64,12 @@ async def upload_file(file: UploadFile = File(...)):
 @app.post("/query")
 async def query_documents(question: str):
 
-    query_embedding = generate_embedding(question)
-
-    relevant_chunks = search_chunks(query_embedding)
-
-    answer = generate_answer(
-        query=question,
-        context_chunks=relevant_chunks
-    )
+    result = app_graph.invoke({
+        "question": question
+    })
 
     return {
         "question": question,
-        "answer": answer,
-        "retrieved_chunks": relevant_chunks
+        "answer": result["answer"],
+        "retrieved_chunks": result["retrieved_chunks"]
     }
