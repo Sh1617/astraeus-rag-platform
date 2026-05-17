@@ -21,4 +21,4 @@ def search_chunks(query_embedding, top_k=5):
         n_results=top_k
     )
 
-    return results
+    return results["documents"][0]
