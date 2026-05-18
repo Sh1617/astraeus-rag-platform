@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 interface NavItem { label: string; href: string }
@@ -17,42 +18,12 @@ const NAV_ITEMS: NavItem[] = [
 ];
 
 const FEATURES: Feature[] = [
-  {
-    icon: "🧠",
-    title: "Multi-Agent Orchestration",
-    desc: "Autonomous agent graph coordinates research, retrieval, memory, tool use, and verification all in a single query lifecycle.",
-    accent: "#00BAF2",
-  },
-  {
-    icon: "📄",
-    title: "PDF Intelligence",
-    desc: "Upload PDFs and let Astraeus extract, chunk, embed, and store ready to answer questions instantly with source attribution.",
-    accent: "#002970",
-  },
-  {
-    icon: "🔍",
-    title: "Semantic Retrieval",
-    desc: "ChromaDB-powered vector search surfaces the most contextually relevant chunks, not just keyword matches.",
-    accent: "#00BAF2",
-  },
-  {
-    icon: "✅",
-    title: "Answer Verification",
-    desc: "A dedicated verification agent cross-checks every answer for factual grounding before it reaches you.",
-    accent: "#002970",
-  },
-  {
-    icon: "🧩",
-    title: "Session Memory",
-    desc: "Redis-backed conversation memory maintains context across turns your assistant remembers what you told it.",
-    accent: "#00BAF2",
-  },
-  {
-    icon: "🔧",
-    title: "Tool-Augmented Reasoning",
-    desc: "Tool agents extend capabilities beyond documents web lookups, calculations, external API calls on demand.",
-    accent: "#002970",
-  },
+  { icon: "🧠", title: "Multi-Agent Orchestration", desc: "Autonomous agent graph coordinates research, retrieval, memory, tool use, and verification all in a single query lifecycle.", accent: "#00BAF2" },
+  { icon: "📄", title: "PDF Intelligence", desc: "Upload PDFs and let Astraeus extract, chunk, embed, and store ready to answer questions instantly with source attribution.", accent: "#002970" },
+  { icon: "🔍", title: "Semantic Retrieval", desc: "ChromaDB-powered vector search surfaces the most contextually relevant chunks, not just keyword matches.", accent: "#00BAF2" },
+  { icon: "✅", title: "Answer Verification", desc: "A dedicated verification agent cross-checks every answer for factual grounding before it reaches you.", accent: "#002970" },
+  { icon: "🧩", title: "Session Memory", desc: "Redis-backed conversation memory maintains context across turns your assistant remembers what you told it.", accent: "#00BAF2" },
+  { icon: "🔧", title: "Tool-Augmented Reasoning", desc: "Tool agents extend capabilities beyond documents web lookups, calculations, external API calls on demand.", accent: "#002970" },
 ];
 
 const STEPS: Step[] = [
@@ -78,24 +49,9 @@ const AGENTS: AgentCard[] = [
 ];
 
 const TESTIMONIALS: Testimonial[] = [
-  {
-    quote: "We replaced three manual research workflows with Astraeus. Our analysts spend zero time digging through PDFs now.",
-    name: "Priya Mehta",
-    role: "Head of Research",
-    company: "Axiom Capital",
-  },
-  {
-    quote: "The multi-agent architecture is impressive. The verification layer alone justifies the switch no more hallucinated answers.",
-    name: "Rohan Sinha",
-    role: "CTO",
-    company: "LegalStack AI",
-  },
-  {
-    quote: "Session memory makes it feel like talking to a colleague who remembers everything. It's genuinely transformative.",
-    name: "Anjali Kapoor",
-    role: "Product Lead",
-    company: "DocuFlow",
-  },
+  { quote: "We replaced three manual research workflows with Astraeus. Our analysts spend zero time digging through PDFs now.", name: "Priya Mehta", role: "Head of Research", company: "Axiom Capital" },
+  { quote: "The multi-agent architecture is impressive. The verification layer alone justifies the switch no more hallucinated answers.", name: "Rohan Sinha", role: "CTO", company: "LegalStack AI" },
+  { quote: "Session memory makes it feel like talking to a colleague who remembers everything. It's genuinely transformative.", name: "Anjali Kapoor", role: "Product Lead", company: "DocuFlow" },
 ];
 
 // ─── Hooks ───────────────────────────────────────────────────────────────────
@@ -114,9 +70,9 @@ function useInView(threshold = 0.15) {
   return { ref, visible };
 }
 
-// ─── Sub-components ──────────────────────────────────────────────────────────
-
+// ─── Navbar ───────────────────────────────────────────────────────────────────
 function Navbar() {
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -136,6 +92,7 @@ function Navbar() {
       }}
     >
       <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
+
         {/* Logo */}
         <a href="#" className="flex items-center gap-2 group">
           <div
@@ -166,25 +123,22 @@ function Navbar() {
           ))}
         </div>
 
-        {/* CTA */}
+        {/* Desktop CTA */}
         <div className="hidden md:flex items-center gap-3">
-          <a
-            href="#"
+          <button
+            onClick={() => navigate("/chat")}
             className="text-sm font-bold px-4 py-2 rounded-lg transition-all hover:opacity-80"
-            style={{ color: scrolled ? "#002970" : "#fff" }}
+            style={{ color: scrolled ? "#002970" : "#fff", background: "transparent", border: "none", cursor: "pointer" }}
           >
             Sign In
-          </a>
-          <a
-            href="#"
+          </button>
+          <button
+            onClick={() => navigate("/chat")}
             className="text-sm font-bold px-5 py-2 rounded-lg transition-all hover:scale-105 active:scale-95"
-            style={{
-              background: scrolled ? "#002970" : "#fff",
-              color: scrolled ? "#fff" : "#002970",
-            }}
+            style={{ background: scrolled ? "#002970" : "#fff", color: scrolled ? "#fff" : "#002970", border: "none", cursor: "pointer" }}
           >
             Get Started Free
-          </a>
+          </button>
         </div>
 
         {/* Mobile hamburger */}
@@ -215,20 +169,22 @@ function Navbar() {
               {n.label}
             </a>
           ))}
-          <a
-            href="#"
+          <button
+            onClick={() => { setMenuOpen(false); navigate("/chat"); }}
             className="text-sm font-bold px-5 py-2 rounded-lg text-center text-white"
-            style={{ background: "#002970" }}
+            style={{ background: "#002970", border: "none", cursor: "pointer" }}
           >
             Get Started Free
-          </a>
+          </button>
         </div>
       )}
     </nav>
   );
 }
 
+// ─── HeroSection ─────────────────────────────────────────────────────────────
 function HeroSection() {
+  const navigate = useNavigate();
   const [typed, setTyped] = useState("");
   const queries = [
     "Summarize the Carnot Report's key findings...",
@@ -266,27 +222,12 @@ function HeroSection() {
       className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-16"
       style={{ background: "linear-gradient(160deg,#002970 0%,#004ab3 45%,#00BAF2 100%)" }}
     >
-      {/* Decorative circles */}
-      <div
-        className="absolute top-[-120px] right-[-120px] w-[480px] h-[480px] rounded-full opacity-10"
-        style={{ background: "radial-gradient(circle,#fff,transparent)" }}
-      />
-      <div
-        className="absolute bottom-[-80px] left-[-80px] w-[320px] h-[320px] rounded-full opacity-10"
-        style={{ background: "radial-gradient(circle,#00BAF2,transparent)" }}
-      />
-
-      {/* Grid dots overlay */}
-      <div
-        className="absolute inset-0 opacity-5"
-        style={{
-          backgroundImage: "radial-gradient(circle,#fff 1px,transparent 1px)",
-          backgroundSize: "32px 32px",
-        }}
-      />
+      <div className="absolute top-[-120px] right-[-120px] w-[480px] h-[480px] rounded-full opacity-10" style={{ background: "radial-gradient(circle,#fff,transparent)" }} />
+      <div className="absolute bottom-[-80px] left-[-80px] w-[320px] h-[320px] rounded-full opacity-10" style={{ background: "radial-gradient(circle,#00BAF2,transparent)" }} />
+      <div className="absolute inset-0 opacity-5" style={{ backgroundImage: "radial-gradient(circle,#fff 1px,transparent 1px)", backgroundSize: "32px 32px" }} />
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 text-center">
-        {/* Badge */}
+
         <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-bold tracking-widest uppercase mb-6 border border-white/20 bg-white/10 text-white backdrop-blur-sm">
           <span className="w-2 h-2 rounded-full bg-[#00BAF2] animate-pulse" />
           AI-Powered RAG Platform
@@ -296,11 +237,7 @@ function HeroSection() {
           Ask Anything.<br />
           <span
             className="inline-block"
-            style={{
-              background: "linear-gradient(90deg,#fff,#00BAF2)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-            }}
+            style={{ background: "linear-gradient(90deg,#fff,#00BAF2)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}
           >
             Get Verified.
           </span>
@@ -310,15 +247,11 @@ function HeroSection() {
           Astraeus turns your documents into an intelligent knowledge base powered by a multi-agent AI architecture with built-in answer verification.
         </p>
 
-        {/* Fake search bar */}
+        {/* Animated search bar */}
         <div className="max-w-2xl mx-auto mb-10">
           <div
             className="flex items-center gap-4 px-5 py-4 rounded-2xl text-left"
-            style={{
-              background: "rgba(255,255,255,0.12)",
-              border: "1.5px solid rgba(255,255,255,0.25)",
-              backdropFilter: "blur(16px)",
-            }}
+            style={{ background: "rgba(255,255,255,0.12)", border: "1.5px solid rgba(255,255,255,0.25)", backdropFilter: "blur(16px)" }}
           >
             <span className="text-2xl">💬</span>
             <span className="text-white/80 flex-1 text-sm md:text-base font-medium min-h-[24px]">
@@ -326,6 +259,7 @@ function HeroSection() {
               <span className="animate-pulse text-[#00BAF2]">|</span>
             </span>
             <button
+              onClick={() => navigate("/chat")}
               className="shrink-0 px-5 py-2 rounded-xl font-bold text-sm text-[#002970] transition-all hover:scale-105 active:scale-95"
               style={{ background: "#fff" }}
             >
@@ -336,13 +270,13 @@ function HeroSection() {
 
         {/* CTAs */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <a
-            href="#"
+          <button
+            onClick={() => navigate("/chat")}
             className="px-8 py-3.5 rounded-xl font-black text-base text-[#002970] transition-all hover:scale-105 active:scale-95 shadow-2xl"
-            style={{ background: "#fff" }}
+            style={{ background: "#fff", border: "none", cursor: "pointer" }}
           >
             Start for Free
-          </a>
+          </button>
           <a
             href="#how-it-works"
             className="px-8 py-3.5 rounded-xl font-bold text-base text-white transition-all hover:bg-white/10 border border-white/25"
@@ -351,7 +285,7 @@ function HeroSection() {
           </a>
         </div>
 
-        {/* Floating stats row */}
+        {/* Stats row */}
         <div className="flex flex-wrap justify-center gap-6 mt-16">
           {[
             { icon: "🤖", text: "6 AI Agents" },
@@ -381,6 +315,7 @@ function HeroSection() {
   );
 }
 
+// ─── StatsSection ─────────────────────────────────────────────────────────────
 function StatsSection() {
   const { ref, visible } = useInView();
   return (
@@ -390,11 +325,7 @@ function StatsSection() {
           <div
             key={s.label}
             className="text-center transition-all duration-700"
-            style={{
-              opacity: visible ? 1 : 0,
-              transform: visible ? "none" : "translateY(24px)",
-              transitionDelay: `${i * 80}ms`,
-            }}
+            style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(24px)", transitionDelay: `${i * 80}ms` }}
           >
             <div className="text-4xl md:text-5xl font-black text-[#002970]">
               {s.value}<span className="text-[#00BAF2]">{s.suffix}</span>
@@ -407,6 +338,7 @@ function StatsSection() {
   );
 }
 
+// ─── FeaturesSection ──────────────────────────────────────────────────────────
 function FeaturesSection() {
   const { ref, visible } = useInView();
   return (
@@ -423,18 +355,12 @@ function FeaturesSection() {
             Everything your team needs<br />to unlock document intelligence.
           </h2>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {FEATURES.map((f, i) => (
             <div
               key={f.title}
               className="group p-7 rounded-2xl border border-gray-100 hover:shadow-xl transition-all duration-500 cursor-pointer"
-              style={{
-                opacity: visible ? 1 : 0,
-                transform: visible ? "none" : "translateY(32px)",
-                transitionDelay: `${i * 80}ms`,
-                background: "#fff",
-              }}
+              style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(32px)", transitionDelay: `${i * 80}ms`, background: "#fff" }}
             >
               <div
                 className="w-12 h-12 rounded-xl flex items-center justify-center text-2xl mb-5 transition-transform group-hover:scale-110"
@@ -444,10 +370,7 @@ function FeaturesSection() {
               </div>
               <h3 className="font-black text-lg text-[#002970] mb-2">{f.title}</h3>
               <p className="text-sm text-gray-500 leading-relaxed">{f.desc}</p>
-              <div
-                className="mt-4 h-0.5 w-0 group-hover:w-12 transition-all duration-300 rounded-full"
-                style={{ background: f.accent }}
-              />
+              <div className="mt-4 h-0.5 w-0 group-hover:w-12 transition-all duration-300 rounded-full" style={{ background: f.accent }} />
             </div>
           ))}
         </div>
@@ -456,15 +379,11 @@ function FeaturesSection() {
   );
 }
 
+// ─── HowItWorksSection ────────────────────────────────────────────────────────
 function HowItWorksSection() {
   const { ref, visible } = useInView();
   return (
-    <section
-      id="how-it-works"
-      ref={ref}
-      className="py-24"
-      style={{ background: "linear-gradient(160deg,#002970 0%,#004ab3 100%)" }}
-    >
+    <section id="how-it-works" ref={ref} className="py-24" style={{ background: "linear-gradient(160deg,#002970 0%,#004ab3 100%)" }}>
       <div className="max-w-5xl mx-auto px-6">
         <div
           className="text-center mb-16 transition-all duration-700"
@@ -477,23 +396,16 @@ function HowItWorksSection() {
             Three steps to<br />intelligent answers.
           </h2>
         </div>
-
         <div className="flex flex-col md:flex-row gap-0">
           {STEPS.map((s, i) => (
             <div
               key={s.num}
               className="flex-1 relative transition-all duration-700"
-              style={{
-                opacity: visible ? 1 : 0,
-                transform: visible ? "none" : "translateY(32px)",
-                transitionDelay: `${i * 120}ms`,
-              }}
+              style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(32px)", transitionDelay: `${i * 120}ms` }}
             >
-              {/* Connector line */}
               {i < STEPS.length - 1 && (
                 <div className="hidden md:block absolute top-8 left-1/2 w-full h-px bg-white/20" />
               )}
-
               <div className="flex flex-col items-center text-center px-6 pb-8 md:pb-0">
                 <div
                   className="w-16 h-16 rounded-2xl flex items-center justify-center font-black text-xl mb-5 relative z-10"
@@ -512,6 +424,7 @@ function HowItWorksSection() {
   );
 }
 
+// ─── AgentsSection ────────────────────────────────────────────────────────────
 function AgentsSection() {
   const { ref, visible } = useInView();
   return (
@@ -531,17 +444,12 @@ function AgentsSection() {
             Every query is handled by a coordinated team of AI agents, each expert in their domain.
           </p>
         </div>
-
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
           {AGENTS.map((a, i) => (
             <div
               key={a.name}
               className="group p-6 rounded-2xl bg-white border border-gray-100 hover:shadow-xl transition-all duration-500"
-              style={{
-                opacity: visible ? 1 : 0,
-                transform: visible ? "none" : "translateY(32px)",
-                transitionDelay: `${i * 80}ms`,
-              }}
+              style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(32px)", transitionDelay: `${i * 80}ms` }}
             >
               <div className="flex items-center gap-4 mb-3">
                 <div
@@ -552,41 +460,24 @@ function AgentsSection() {
                 </div>
                 <div>
                   <div className="font-black text-[#002970] text-sm">{a.name}</div>
-                  <div
-                    className="text-xs font-bold uppercase tracking-widest"
-                    style={{ color: a.color }}
-                  >
-                    Agent
-                  </div>
+                  <div className="text-xs font-bold uppercase tracking-widest" style={{ color: a.color }}>Agent</div>
                 </div>
               </div>
               <p className="text-sm text-gray-500 leading-relaxed">{a.role}</p>
             </div>
           ))}
         </div>
-
-        {/* Architecture diagram hint */}
         <div
           className="mt-12 p-6 rounded-2xl text-center transition-all duration-700"
-          style={{
-            background: "linear-gradient(135deg,#002970,#004ab3)",
-            opacity: visible ? 1 : 0,
-            transitionDelay: "500ms",
-          }}
+          style={{ background: "linear-gradient(135deg,#002970,#004ab3)", opacity: visible ? 1 : 0, transitionDelay: "500ms" }}
         >
           <div className="flex flex-wrap items-center justify-center gap-3 text-white text-sm font-semibold">
-            <span>🎯 Orchestrator</span>
-            <span className="text-[#00BAF2]">→</span>
-            <span>🔬 Research</span>
-            <span className="text-[#00BAF2]">+</span>
-            <span>📡 Retrieval</span>
-            <span className="text-[#00BAF2]">+</span>
-            <span>💾 Memory</span>
-            <span className="text-[#00BAF2]">+</span>
-            <span>🔧 Tool</span>
-            <span className="text-[#00BAF2]">→</span>
-            <span>✅ Verify</span>
-            <span className="text-[#00BAF2]">→</span>
+            <span>🎯 Orchestrator</span><span className="text-[#00BAF2]">→</span>
+            <span>🔬 Research</span><span className="text-[#00BAF2]">+</span>
+            <span>📡 Retrieval</span><span className="text-[#00BAF2]">+</span>
+            <span>💾 Memory</span><span className="text-[#00BAF2]">+</span>
+            <span>🔧 Tool</span><span className="text-[#00BAF2]">→</span>
+            <span>✅ Verify</span><span className="text-[#00BAF2]">→</span>
             <span className="px-3 py-1 rounded-full bg-[#00BAF2] text-[#002970] font-black">Answer</span>
           </div>
         </div>
@@ -595,6 +486,7 @@ function AgentsSection() {
   );
 }
 
+// ─── TestimonialsSection ──────────────────────────────────────────────────────
 function TestimonialsSection() {
   const { ref, visible } = useInView();
   return (
@@ -609,17 +501,12 @@ function TestimonialsSection() {
           </span>
           <h2 className="text-4xl font-black text-[#002970]">Loved by knowledge teams.</h2>
         </div>
-
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {TESTIMONIALS.map((t, i) => (
             <div
               key={t.name}
               className="p-7 rounded-2xl border border-gray-100 hover:shadow-xl transition-all duration-500"
-              style={{
-                opacity: visible ? 1 : 0,
-                transform: visible ? "none" : "translateY(32px)",
-                transitionDelay: `${i * 100}ms`,
-              }}
+              style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(32px)", transitionDelay: `${i * 100}ms` }}
             >
               <div className="text-[#00BAF2] text-4xl font-black mb-4">"</div>
               <p className="text-gray-700 text-sm leading-relaxed mb-6">{t.quote}</p>
@@ -643,14 +530,12 @@ function TestimonialsSection() {
   );
 }
 
+// ─── CTASection ───────────────────────────────────────────────────────────────
 function CTASection() {
   const { ref, visible } = useInView();
+  const navigate = useNavigate();
   return (
-    <section
-      ref={ref}
-      className="py-24"
-      style={{ background: "linear-gradient(160deg,#002970 0%,#00BAF2 100%)" }}
-    >
+    <section ref={ref} className="py-24" style={{ background: "linear-gradient(160deg,#002970 0%,#00BAF2 100%)" }}>
       <div
         className="max-w-3xl mx-auto px-6 text-center transition-all duration-700"
         style={{ opacity: visible ? 1 : 0, transform: visible ? "none" : "translateY(24px)" }}
@@ -662,19 +547,20 @@ function CTASection() {
           Join teams who've stopped searching and started knowing. No setup fees, no configuration headaches.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <a
-            href="#"
+          <button
+            onClick={() => navigate("/chat")}
             className="px-10 py-4 rounded-xl font-black text-[#002970] text-base transition-all hover:scale-105 active:scale-95 shadow-2xl"
-            style={{ background: "#fff" }}
+            style={{ background: "#fff", border: "none", cursor: "pointer" }}
           >
             Get Started It's Free
-          </a>
-          <a
-            href="#"
+          </button>
+          <button
+            onClick={() => navigate("/chat")}
             className="px-10 py-4 rounded-xl font-bold text-white text-base border border-white/30 hover:bg-white/10 transition-all"
+            style={{ background: "transparent", cursor: "pointer" }}
           >
             Request a Demo
-          </a>
+          </button>
         </div>
         <p className="text-blue-200 text-sm mt-6">No credit card required · Free forever plan available</p>
       </div>
@@ -682,6 +568,7 @@ function CTASection() {
   );
 }
 
+// ─── Footer ───────────────────────────────────────────────────────────────────
 function Footer() {
   return (
     <footer className="bg-[#001845] text-white py-12">
@@ -701,7 +588,6 @@ function Footer() {
               Multi-agent RAG platform for intelligent document understanding and verified AI answers.
             </p>
           </div>
-
           <div className="grid grid-cols-2 gap-8 text-sm">
             <div>
               <div className="font-black text-blue-200 mb-3 uppercase tracking-widest text-xs">Product</div>
@@ -717,7 +603,6 @@ function Footer() {
             </div>
           </div>
         </div>
-
         <div className="border-t border-white/10 mt-10 pt-6 flex flex-col md:flex-row justify-between items-center text-xs text-blue-400 gap-2">
           <span>© 2025 Astraeus. All rights reserved.</span>
           <div className="flex gap-4">

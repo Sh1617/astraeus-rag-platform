@@ -13,6 +13,7 @@ from retriever import store_chunk
 
 from agents.orchestrator.graph import app_graph
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 
 app = FastAPI()
 
@@ -92,3 +93,24 @@ async def query_documents(
     "verification": result["verification"],
     "tool_result": result["tool_result"]
     }
+
+@app.post("/stream-query")
+async def stream_query(question: str, session_id: str):
+
+    async def generate():
+
+        result = app_graph.invoke({
+            "session_id": session_id,
+            "question": question,
+        })
+
+        answer = result["answer"]
+
+        for word in answer.split():
+
+            yield word + " "
+
+    return StreamingResponse(
+        generate(),
+        media_type="text/plain"
+    )

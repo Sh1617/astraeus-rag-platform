@@ -98,7 +98,6 @@ function GuestModal({ onConfirm }: { onConfirm: (name: string) => void }) {
         className="w-full max-w-sm mx-4 rounded-3xl shadow-2xl overflow-hidden"
         style={{ background: "#fff", border: "1.5px solid #e2e8f0" }}
       >
-        {/* Header */}
         <div
           className="px-8 pt-8 pb-7"
           style={{ background: "linear-gradient(135deg,#002970 0%,#00BAF2 100%)" }}
@@ -115,7 +114,6 @@ function GuestModal({ onConfirm }: { onConfirm: (name: string) => void }) {
           </p>
         </div>
 
-        {/* Body */}
         <div className="px-8 py-6 flex flex-col gap-4">
           <div>
             <label className="block text-xs font-black uppercase tracking-widest text-[#002970] mb-2">
@@ -130,16 +128,12 @@ function GuestModal({ onConfirm }: { onConfirm: (name: string) => void }) {
               placeholder="e.g. Priya, Rohan, Team Alpha…"
               maxLength={32}
               className="w-full px-4 py-3 rounded-xl text-sm font-semibold outline-none transition-all"
-              style={{
-                border: "1.5px solid #e2e8f0",
-                color: "#002970",
-                background: "#f8fafc",
-              }}
+              style={{ border: "1.5px solid #e2e8f0", color: "#002970", background: "#f8fafc" }}
               onFocus={(e) => (e.target.style.borderColor = "#00BAF2")}
               onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
             />
             <p className="text-xs text-slate-400 mt-1.5">
-              Saved locally on this device no signup, no password.
+              Saved locally on this device — no signup, no password.
             </p>
           </div>
 
@@ -158,12 +152,11 @@ function GuestModal({ onConfirm }: { onConfirm: (name: string) => void }) {
             Continue as Guest
           </button>
 
-          {/* How it works note */}
           <div
             className="rounded-xl p-3 text-xs text-slate-500 leading-relaxed"
             style={{ background: "#f8fafc", border: "1px solid #f1f5f9" }}
           >
-            💡 Different names = different isolated sessions. Share this app with teammates each person gets their own independent conversation history.
+            💡 Different names = different isolated sessions. Share this app with teammates — each person gets their own independent conversation history.
           </div>
         </div>
       </div>
@@ -191,18 +184,13 @@ function AgentPipeline({ steps }: { steps: AgentStep[] }) {
                 border: `1px solid ${done ? "#93c5fd" : active ? "#bae6fd" : "#e2e8f0"}`,
               }}
             >
-              <span
-                className={active ? "animate-spin inline-block" : ""}
-                style={{ animationDuration: "1s" }}
-              >
+              <span className={active ? "animate-spin inline-block" : ""} style={{ animationDuration: "1s" }}>
                 {done ? "✓" : a.icon}
               </span>
               {a.label}
             </div>
             {i < AGENT_STEPS.length - 1 && (
-              <span className="text-xs" style={{ color: done ? "#93c5fd" : "#e2e8f0" }}>
-                →
-              </span>
+              <span className="text-xs" style={{ color: done ? "#93c5fd" : "#e2e8f0" }}>→</span>
             )}
           </div>
         );
@@ -268,48 +256,32 @@ function MessageBubble({ msg, userName }: { msg: Message; userName: string }) {
 
   return (
     <div className={`flex gap-3 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
-      {/* Avatar */}
       <div
         className="w-8 h-8 rounded-xl flex items-center justify-center text-xs font-black shrink-0 mt-0.5 shadow-sm"
         style={
           isUser
             ? { background: "linear-gradient(135deg,#002970,#004ab3)", color: "#fff" }
-            : {
-                background: "#fff",
-                color: "#002970",
-                border: "1.5px solid #bae6fd",
-              }
+            : { background: "#fff", color: "#002970", border: "1.5px solid #bae6fd" }
         }
       >
         {isUser ? initials(userName) || "U" : "A"}
       </div>
 
       <div className={`flex flex-col gap-1.5 max-w-[76%] ${isUser ? "items-end" : "items-start"}`}>
-        {/* Name + time */}
         <div className={`flex items-center gap-2 ${isUser ? "flex-row-reverse" : "flex-row"}`}>
           <span className="text-xs font-bold text-slate-400">{isUser ? userName : "Astraeus"}</span>
           <span className="text-xs text-slate-300">{fmt(msg.timestamp)}</span>
         </div>
 
-        {/* Bubble */}
         <div
           className="px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm"
           style={
             isUser
-              ? {
-                  background: "linear-gradient(135deg,#002970,#004ab3)",
-                  color: "#fff",
-                  borderBottomRightRadius: 4,
-                }
-              : {
-                  background: "#fff",
-                  color: "#1e293b",
-                  border: "1.5px solid #e2e8f0",
-                  borderBottomLeftRadius: 4,
-                }
+              ? { background: "linear-gradient(135deg,#002970,#004ab3)", color: "#fff", borderBottomRightRadius: 4 }
+              : { background: "#fff", color: "#1e293b", border: "1.5px solid #e2e8f0", borderBottomLeftRadius: 4 }
           }
         >
-          {msg.isLoading ? (
+          {msg.isLoading && !msg.content ? (
             <span className="flex items-center gap-2 text-slate-400 text-xs">
               <span className="flex gap-1">
                 {[0, 1, 2].map((i) => (
@@ -323,16 +295,20 @@ function MessageBubble({ msg, userName }: { msg: Message; userName: string }) {
               Thinking…
             </span>
           ) : (
-            msg.content
+            <>
+              {msg.content}
+              {/* Blinking cursor while streaming */}
+              {msg.isLoading && msg.content && (
+                <span className="animate-pulse text-[#00BAF2] ml-0.5">▌</span>
+              )}
+            </>
           )}
         </div>
 
-        {/* Agent trace */}
         {!isUser && msg.agentTrace && msg.agentTrace.length > 0 && (
           <AgentPipeline steps={msg.agentTrace} />
         )}
 
-        {/* Meta row */}
         {!isUser && !msg.isLoading && (
           <div className="flex items-center gap-2 flex-wrap">
             {msg.verification && <VerificationBadge v={msg.verification} />}
@@ -347,8 +323,7 @@ function MessageBubble({ msg, userName }: { msg: Message; userName: string }) {
                   border: `1px solid ${showSources ? "#93c5fd" : "#e2e8f0"}`,
                 }}
               >
-                📚 {msg.retrieved_chunks.length} source
-                {msg.retrieved_chunks.length !== 1 ? "s" : ""}
+                📚 {msg.retrieved_chunks.length} source{msg.retrieved_chunks.length !== 1 ? "s" : ""}
               </button>
             )}
 
@@ -363,7 +338,6 @@ function MessageBubble({ msg, userName }: { msg: Message; userName: string }) {
           </div>
         )}
 
-        {/* Sources panel */}
         {showSources && msg.retrieved_chunks && msg.retrieved_chunks.length > 0 && (
           <div className="w-full flex flex-col gap-2 mt-1">
             {msg.retrieved_chunks.map((c, i) => (
@@ -372,7 +346,6 @@ function MessageBubble({ msg, userName }: { msg: Message; userName: string }) {
           </div>
         )}
 
-        {/* Tool result */}
         {showSources && msg.tool_result && (
           <div
             className="w-full p-3 rounded-xl text-xs font-mono leading-relaxed mt-1"
@@ -405,21 +378,13 @@ function Sidebar({
   return (
     <>
       {open && (
-        <div
-          className="fixed inset-0 z-20 bg-black/10 md:hidden"
-          onClick={onClose}
-        />
+        <div className="fixed inset-0 z-20 bg-black/10 md:hidden" onClick={onClose} />
       )}
       <aside
         className="flex flex-col shrink-0 transition-all duration-300 overflow-hidden border-r z-30 relative"
-        style={{
-          width: open ? 264 : 0,
-          background: "#fff",
-          borderColor: "#e2e8f0",
-        }}
+        style={{ width: open ? 264 : 0, background: "#fff", borderColor: "#e2e8f0" }}
       >
         <div className="flex flex-col h-full min-w-[264px]">
-          {/* Header */}
           <div className="flex items-center justify-between px-5 py-4 border-b border-[#f1f5f9]">
             <div className="flex items-center gap-2">
               <div
@@ -430,15 +395,9 @@ function Sidebar({
               </div>
               <span className="font-black text-[#002970] text-base tracking-tight">ASTRAEUS</span>
             </div>
-            <button
-              onClick={onClose}
-              className="text-slate-300 hover:text-slate-500 transition-colors text-sm font-bold"
-            >
-              ✕
-            </button>
+            <button onClick={onClose} className="text-slate-300 hover:text-slate-500 transition-colors text-sm font-bold">✕</button>
           </div>
 
-          {/* Actions */}
           <div className="px-4 py-3 flex flex-col gap-2">
             <button
               onClick={onNewChat}
@@ -462,16 +421,12 @@ function Sidebar({
             />
           </div>
 
-          {/* Doc list */}
           <div className="flex-1 overflow-y-auto px-4 pb-4">
             <p className="text-xs font-black uppercase tracking-widest text-slate-300 mb-2">
               Documents ({docs.length})
             </p>
             {docs.length === 0 ? (
-              <div
-                className="rounded-xl p-4 text-center border border-dashed"
-                style={{ borderColor: "#e2e8f0" }}
-              >
+              <div className="rounded-xl p-4 text-center border border-dashed" style={{ borderColor: "#e2e8f0" }}>
                 <p className="text-xs text-slate-300 leading-relaxed">
                   No documents yet.<br />Upload a PDF to start Q&A.
                 </p>
@@ -479,17 +434,12 @@ function Sidebar({
             ) : (
               <div className="flex flex-col gap-1.5">
                 {docs.map((d, i) => (
-                  <div
-                    key={i}
-                    className="px-3 py-2.5 rounded-xl border border-[#e2e8f0] hover:bg-blue-50 hover:border-blue-200 transition-all cursor-pointer"
-                  >
+                  <div key={i} className="px-3 py-2.5 rounded-xl border border-[#e2e8f0] hover:bg-blue-50 hover:border-blue-200 transition-all cursor-pointer">
                     <div className="flex items-start gap-2">
                       <span className="text-sm mt-0.5">📄</span>
                       <div className="min-w-0">
                         <p className="text-xs font-semibold text-[#002970] truncate">{d.name}</p>
-                        <p className="text-xs text-slate-400 mt-0.5">
-                          {d.chunks} chunks · {fmt(d.uploadedAt)}
-                        </p>
+                        <p className="text-xs text-slate-400 mt-0.5">{d.chunks} chunks · {fmt(d.uploadedAt)}</p>
                       </div>
                     </div>
                   </div>
@@ -498,7 +448,6 @@ function Sidebar({
             )}
           </div>
 
-          {/* User footer */}
           <div className="px-4 py-3 border-t border-[#f1f5f9]">
             <div className="flex items-center gap-3 px-3 py-2.5 rounded-xl bg-[#f8fafc] border border-[#f1f5f9]">
               <div
@@ -535,6 +484,7 @@ export default function ChatPage() {
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -566,11 +516,17 @@ export default function ChatPage() {
     setTimeout(() => setUploadStatus(null), 4000);
   }, []);
 
+  // ── Streaming send ──────────────────────────────────────────────────────────
   const handleSend = useCallback(
     async (text?: string) => {
       const q = (text ?? input).trim();
       if (!q || loading) return;
       setInput("");
+
+      // Cancel any in-flight request
+      abortRef.current?.abort();
+      const abort = new AbortController();
+      abortRef.current = abort;
 
       const userMsg: Message = {
         id: uid(), role: "user", content: q, timestamp: new Date(),
@@ -584,8 +540,8 @@ export default function ChatPage() {
       setMessages((m) => [...m, userMsg, placeholder]);
       setLoading(true);
 
-      // Animate agent trace into the placeholder bubble in real time
-      const tracePromise = simulateAgentTrace((step) => {
+      // Run the visual agent trace animation in parallel
+      simulateAgentTrace((step) => {
         setMessages((m) =>
           m.map((msg) =>
             msg.id === placeholderId
@@ -596,39 +552,110 @@ export default function ChatPage() {
       });
 
       try {
-        const [res] = await Promise.all([
-          fetch(
-            `${API_BASE}/query?question=${encodeURIComponent(q)}&session_id=${sessionId}`,
-            { method: "POST" }
-          ),
-          tracePromise,
-        ]);
+        const res = await fetch(
+          `${API_BASE}/stream-query?question=${encodeURIComponent(q)}&session_id=${encodeURIComponent(sessionId)}`,
+          { method: "POST", signal: abort.signal }
+        );
 
-        if (!res.ok) throw new Error();
-        const data = await res.json();
+        if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
 
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
+        let buffer = "";
+
+        const processChunk = (raw: string) => {
+          if (!raw || raw === "[DONE]") return;
+          // Try to parse as metadata JSON (sent as the last event)
+          try {
+            const meta = JSON.parse(raw) as {
+              retrieved_chunks?: Chunk[];
+              verification?: Verification;
+              tool_result?: string;
+              answer?: string; // some backends wrap the full answer here
+            };
+            // If it has answer text, append that first
+            if (meta.answer) {
+              setMessages((m) =>
+                m.map((msg) =>
+                  msg.id === placeholderId
+                    ? { ...msg, content: msg.content + meta.answer }
+                    : msg
+                )
+              );
+            }
+            // Finalize with metadata
+            setMessages((m) =>
+              m.map((msg) =>
+                msg.id === placeholderId
+                  ? {
+                      ...msg,
+                      isLoading: false,
+                      retrieved_chunks: meta.retrieved_chunks ?? msg.retrieved_chunks ?? [],
+                      verification: meta.verification ?? msg.verification,
+                      tool_result: meta.tool_result ?? msg.tool_result,
+                      agentTrace: AGENT_STEPS.map((a) => a.key),
+                    }
+                  : msg
+              )
+            );
+          } catch {
+            // Plain text token — append directly to content
+            setMessages((m) =>
+              m.map((msg) =>
+                msg.id === placeholderId
+                  ? { ...msg, content: msg.content + raw }
+                  : msg
+              )
+            );
+          }
+        };
+
+        // Stream read loop — handles SSE (data: ...), raw text, and NDJSON
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+
+          buffer += decoder.decode(value, { stream: true });
+          const lines = buffer.split("\n");
+          buffer = lines.pop() ?? ""; // keep incomplete last line
+
+          for (const line of lines) {
+            const trimmed = line.trim();
+            if (!trimmed) continue;
+
+            if (trimmed.startsWith("data:")) {
+              // Standard SSE format: data: <payload>
+              processChunk(trimmed.slice(5).trim());
+            } else if (trimmed.startsWith("event:") || trimmed.startsWith("id:") || trimmed.startsWith(":")) {
+              // SSE control lines — skip
+              continue;
+            } else {
+              // Raw text or NDJSON — treat the whole line as a chunk
+              processChunk(trimmed);
+            }
+          }
+        }
+
+        // Flush any remaining buffer content
+        if (buffer.trim()) processChunk(buffer.trim());
+
+        // Ensure loading flag is cleared even if no metadata frame arrived
         setMessages((m) =>
           m.map((msg) =>
-            msg.id === placeholderId
-              ? {
-                  ...msg,
-                  content: data.answer || "No answer returned.",
-                  isLoading: false,
-                  retrieved_chunks: data.retrieved_chunks ?? [],
-                  verification: data.verification,
-                  tool_result: data.tool_result,
-                  agentTrace: AGENT_STEPS.map((a) => a.key),
-                }
+            msg.id === placeholderId && msg.isLoading
+              ? { ...msg, isLoading: false, agentTrace: AGENT_STEPS.map((a) => a.key) }
               : msg
           )
         );
-      } catch {
+      } catch (err: unknown) {
+        if (err instanceof Error && err.name === "AbortError") return;
         setMessages((m) =>
           m.map((msg) =>
             msg.id === placeholderId
               ? {
                   ...msg,
                   content:
+                    msg.content ||
                     "Couldn't reach the backend. Make sure Astraeus is running on localhost:8000.",
                   isLoading: false,
                   verification: { verified: false, confidence: 0 },
@@ -653,11 +680,11 @@ export default function ChatPage() {
   };
 
   const clearChat = () => {
+    abortRef.current?.abort();
     setMessages([]);
     setLoading(false);
   };
 
-  // ── Show guest modal if no name yet ──
   if (!userName) {
     return <GuestModal onConfirm={(n) => setUserName(n)} />;
   }
@@ -679,7 +706,6 @@ export default function ChatPage() {
         onClose={() => setSidebarOpen(false)}
       />
 
-      {/* Main panel */}
       <div className="flex flex-col flex-1 min-w-0 bg-white">
 
         {/* Topbar */}
@@ -713,16 +739,8 @@ export default function ChatPage() {
               <span
                 className="text-xs font-semibold px-3 py-1.5 rounded-full"
                 style={{
-                  background: uploadStatus.startsWith("✓")
-                    ? "#dcfce7"
-                    : uploadStatus.startsWith("✗")
-                    ? "#fee2e2"
-                    : "#dbeafe",
-                  color: uploadStatus.startsWith("✓")
-                    ? "#15803d"
-                    : uploadStatus.startsWith("✗")
-                    ? "#dc2626"
-                    : "#002970",
+                  background: uploadStatus.startsWith("✓") ? "#dcfce7" : uploadStatus.startsWith("✗") ? "#fee2e2" : "#dbeafe",
+                  color: uploadStatus.startsWith("✓") ? "#15803d" : uploadStatus.startsWith("✗") ? "#dc2626" : "#002970",
                 }}
               >
                 {uploadStatus}
@@ -735,10 +753,7 @@ export default function ChatPage() {
               + New Chat
             </button>
             <button
-              onClick={() => {
-                localStorage.removeItem(STORAGE_KEY);
-                setUserName(null);
-              }}
+              onClick={() => { localStorage.removeItem(STORAGE_KEY); setUserName(null); }}
               className="text-xs font-semibold px-3 py-1.5 rounded-lg text-slate-400 hover:text-slate-600 border border-[#e2e8f0] hover:bg-slate-50 transition-all"
               title="Switch user"
             >
@@ -750,7 +765,6 @@ export default function ChatPage() {
         {/* Chat area */}
         <div className="flex-1 overflow-y-auto bg-[#f8fafc]">
           {isEmpty ? (
-            /* Empty state */
             <div className="flex flex-col items-center justify-center h-full px-6 py-12 gap-8">
               <div className="text-center">
                 <div
@@ -763,19 +777,15 @@ export default function ChatPage() {
                   Hello, {userName.split(" ")[0]}!
                 </h2>
                 <p className="text-slate-400 text-sm max-w-sm mx-auto leading-relaxed">
-                  Upload PDFs using the sidebar, then ask anything six specialised agents will research, retrieve, and verify your answer.
+                  Upload PDFs using the sidebar, then ask anything — six specialised agents will research, retrieve, and verify your answer.
                 </p>
               </div>
 
-              {/* Pipeline preview */}
               <div className="w-full max-w-lg bg-white rounded-2xl border border-[#e2e8f0] shadow-sm px-5 py-4">
-                <p className="text-xs font-black text-slate-300 uppercase tracking-widest mb-3">
-                  Agent Pipeline
-                </p>
+                <p className="text-xs font-black text-slate-300 uppercase tracking-widest mb-3">Agent Pipeline</p>
                 <AgentPipeline steps={[]} />
               </div>
 
-              {/* Suggested */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full max-w-lg">
                 {SUGGESTED_QUERIES.map((q) => (
                   <button
@@ -822,10 +832,7 @@ export default function ChatPage() {
                 disabled={!input.trim() || loading}
                 className="shrink-0 w-9 h-9 rounded-xl flex items-center justify-center font-black text-sm transition-all hover:scale-105 active:scale-95 disabled:opacity-30 disabled:cursor-not-allowed disabled:scale-100"
                 style={{
-                  background:
-                    input.trim() && !loading
-                      ? "linear-gradient(135deg,#002970,#00BAF2)"
-                      : "#f1f5f9",
+                  background: input.trim() && !loading ? "linear-gradient(135deg,#002970,#00BAF2)" : "#f1f5f9",
                   color: input.trim() && !loading ? "#fff" : "#94a3b8",
                 }}
               >
