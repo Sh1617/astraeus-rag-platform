@@ -2,11 +2,14 @@
 backend/venv/
 
 # Python Cache
-_pycache_/
+__pycache__/
 *.pyc
 
 # Node Modules
 node_modules/
+
+# Build Files
+dist/
 
 # Environment Variables
 .env
