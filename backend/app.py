@@ -12,8 +12,20 @@ from embedder import generate_embedding
 from retriever import store_chunk
 
 from agents.orchestrator.graph import app_graph
+from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
+
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 
 UPLOAD_DIR = "uploads"
 

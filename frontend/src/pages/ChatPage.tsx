@@ -139,7 +139,7 @@ function GuestModal({ onConfirm }: { onConfirm: (name: string) => void }) {
               onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
             />
             <p className="text-xs text-slate-400 mt-1.5">
-              Saved locally on this device — no signup, no password.
+              Saved locally on this device no signup, no password.
             </p>
           </div>
 
@@ -163,7 +163,7 @@ function GuestModal({ onConfirm }: { onConfirm: (name: string) => void }) {
             className="rounded-xl p-3 text-xs text-slate-500 leading-relaxed"
             style={{ background: "#f8fafc", border: "1px solid #f1f5f9" }}
           >
-            💡 Different names = different isolated sessions. Share this app with teammates — each person gets their own independent conversation history.
+            💡 Different names = different isolated sessions. Share this app with teammates each person gets their own independent conversation history.
           </div>
         </div>
       </div>
@@ -763,7 +763,7 @@ export default function ChatPage() {
                   Hello, {userName.split(" ")[0]}!
                 </h2>
                 <p className="text-slate-400 text-sm max-w-sm mx-auto leading-relaxed">
-                  Upload PDFs using the sidebar, then ask anything — six specialised agents will research, retrieve, and verify your answer.
+                  Upload PDFs using the sidebar, then ask anything six specialised agents will research, retrieve, and verify your answer.
                 </p>
               </div>
 
