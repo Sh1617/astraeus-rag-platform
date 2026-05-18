@@ -523,7 +523,7 @@ export default function ChatPage() {
       if (!q || loading) return;
       setInput("");
 
-      // Cancel any in-flight request
+      // Cancel any in-flight stream
       abortRef.current?.abort();
       const abort = new AbortController();
       abortRef.current = abort;
@@ -540,7 +540,7 @@ export default function ChatPage() {
       setMessages((m) => [...m, userMsg, placeholder]);
       setLoading(true);
 
-      // Run the visual agent trace animation in parallel
+      // Visual agent trace runs in parallel — purely cosmetic
       simulateAgentTrace((step) => {
         setMessages((m) =>
           m.map((msg) =>
@@ -559,91 +559,72 @@ export default function ChatPage() {
 
         if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
 
-        const reader = res.body.getReader();
-        const decoder = new TextDecoder();
-        let buffer = "";
+        const reader   = res.body.getReader();
+        const decoder  = new TextDecoder("utf-8");
 
-        const processChunk = (raw: string) => {
-          if (!raw || raw === "[DONE]") return;
-          // Try to parse as metadata JSON (sent as the last event)
-          try {
-            const meta = JSON.parse(raw) as {
-              retrieved_chunks?: Chunk[];
-              verification?: Verification;
-              tool_result?: string;
-              answer?: string; // some backends wrap the full answer here
-            };
-            // If it has answer text, append that first
-            if (meta.answer) {
-              setMessages((m) =>
-                m.map((msg) =>
-                  msg.id === placeholderId
-                    ? { ...msg, content: msg.content + meta.answer }
-                    : msg
-                )
-              );
-            }
-            // Finalize with metadata
-            setMessages((m) =>
-              m.map((msg) =>
-                msg.id === placeholderId
-                  ? {
-                      ...msg,
-                      isLoading: false,
-                      retrieved_chunks: meta.retrieved_chunks ?? msg.retrieved_chunks ?? [],
-                      verification: meta.verification ?? msg.verification,
-                      tool_result: meta.tool_result ?? msg.tool_result,
-                      agentTrace: AGENT_STEPS.map((a) => a.key),
-                    }
-                  : msg
-              )
-            );
-          } catch {
-            // Plain text token — append directly to content
-            setMessages((m) =>
-              m.map((msg) =>
-                msg.id === placeholderId
-                  ? { ...msg, content: msg.content + raw }
-                  : msg
-              )
-            );
+        // ── Micro-batch flush ──────────────────────────────────────────────
+        // We accumulate tokens in a ref between animation frames so React
+        // never skips a re-render yet also never triggers hundreds of
+        // synchronous setState calls per second.
+        let pendingText = "";
+        let rafId: number | null = null;
+
+        const flush = () => {
+          rafId = null;
+          if (!pendingText) return;
+          const chunk = pendingText;
+          pendingText = "";
+          setMessages((m) =>
+            m.map((msg) =>
+              msg.id === placeholderId
+                ? { ...msg, content: msg.content + chunk }
+                : msg
+            )
+          );
+        };
+
+        const appendToken = (token: string) => {
+          pendingText += token;
+          // Schedule one flush per animation frame (~16 ms) — smooth and cheap
+          if (rafId === null) {
+            rafId = requestAnimationFrame(flush);
           }
         };
 
-        // Stream read loop — handles SSE (data: ...), raw text, and NDJSON
+        // ── Read loop ──────────────────────────────────────────────────────
+        // Backend sends plain UTF-8 text via FastAPI StreamingResponse.
+        // Each read() call may deliver one or more tokens; we decode
+        // incrementally so multi-byte characters are never split.
         while (true) {
           const { done, value } = await reader.read();
           if (done) break;
 
-          buffer += decoder.decode(value, { stream: true });
-          const lines = buffer.split("\n");
-          buffer = lines.pop() ?? ""; // keep incomplete last line
-
-          for (const line of lines) {
-            const trimmed = line.trim();
-            if (!trimmed) continue;
-
-            if (trimmed.startsWith("data:")) {
-              // Standard SSE format: data: <payload>
-              processChunk(trimmed.slice(5).trim());
-            } else if (trimmed.startsWith("event:") || trimmed.startsWith("id:") || trimmed.startsWith(":")) {
-              // SSE control lines — skip
-              continue;
-            } else {
-              // Raw text or NDJSON — treat the whole line as a chunk
-              processChunk(trimmed);
-            }
-          }
+          // stream:true keeps the decoder's internal state between calls
+          // so a UTF-8 sequence split across two chunks is handled correctly.
+          const text = decoder.decode(value, { stream: true });
+          if (text) appendToken(text);
         }
 
-        // Flush any remaining buffer content
-        if (buffer.trim()) processChunk(buffer.trim());
+        // Flush the decoder's internal buffer (stream:false finalizes state)
+        const tail = decoder.decode();
+        if (tail) appendToken(tail);
 
-        // Ensure loading flag is cleared even if no metadata frame arrived
+        // Cancel any pending raf and do a final synchronous flush
+        if (rafId !== null) {
+          cancelAnimationFrame(rafId);
+          rafId = null;
+        }
+        flush();
+
+        // Mark complete
         setMessages((m) =>
           m.map((msg) =>
-            msg.id === placeholderId && msg.isLoading
-              ? { ...msg, isLoading: false, agentTrace: AGENT_STEPS.map((a) => a.key) }
+            msg.id === placeholderId
+              ? {
+                  ...msg,
+                  isLoading: false,
+                  agentTrace: AGENT_STEPS.map((a) => a.key),
+                }
               : msg
           )
         );
