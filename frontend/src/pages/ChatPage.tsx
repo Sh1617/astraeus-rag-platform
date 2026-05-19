@@ -560,64 +560,28 @@ export default function ChatPage() {
 
         if (!res.ok || !res.body) throw new Error(`HTTP ${res.status}`);
 
-        const reader   = res.body.getReader();
-        const decoder  = new TextDecoder("utf-8");
+        const reader = res.body.getReader();
+        const decoder = new TextDecoder();
 
-        // ── Micro-batch flush ──────────────────────────────────────────────
-        // We accumulate tokens in a ref between animation frames so React
-        // never skips a re-render yet also never triggers hundreds of
-        // synchronous setState calls per second.
-        let pendingText = "";
-        let rafId: number | null = null;
+        while (true) {
+          const { done, value } = await reader.read();
 
-        const flush = () => {
-          rafId = null;
-          if (!pendingText) return;
-          const chunk = pendingText;
-          pendingText = "";
+          if (done) break;
+
+          const chunk = decoder.decode(value);
+
           setMessages((m) =>
             m.map((msg) =>
               msg.id === placeholderId
-                ? { ...msg, content: msg.content + chunk }
+                ? {
+                    ...msg,
+                    content: msg.content + chunk,
+                  }
                 : msg
             )
           );
-        };
-
-        const appendToken = (token: string) => {
-          pendingText += token;
-          // Schedule one flush per animation frame (~16 ms) — smooth and cheap
-          if (rafId === null) {
-            rafId = requestAnimationFrame(flush);
-          }
-        };
-
-        // ── Read loop ──────────────────────────────────────────────────────
-        // Backend sends plain UTF-8 text via FastAPI StreamingResponse.
-        // Each read() call may deliver one or more tokens; we decode
-        // incrementally so multi-byte characters are never split.
-        while (true) {
-          const { done, value } = await reader.read();
-          if (done) break;
-
-          // stream:true keeps the decoder's internal state between calls
-          // so a UTF-8 sequence split across two chunks is handled correctly.
-          const text = decoder.decode(value, { stream: true });
-          if (text) appendToken(text);
         }
 
-        // Flush the decoder's internal buffer (stream:false finalizes state)
-        const tail = decoder.decode();
-        if (tail) appendToken(tail);
-
-        // Cancel any pending raf and do a final synchronous flush
-        if (rafId !== null) {
-          cancelAnimationFrame(rafId);
-          rafId = null;
-        }
-        flush();
-
-        // Mark complete
         setMessages((m) =>
           m.map((msg) =>
             msg.id === placeholderId
