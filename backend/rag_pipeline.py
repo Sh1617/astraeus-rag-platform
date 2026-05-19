@@ -51,7 +51,7 @@ def generate_answer(query, context_chunks):
     """
 
     stream = ollama.chat(
-        model="llama3",
+        model="phi3",
         messages=[
             {
                 "role": "user",
