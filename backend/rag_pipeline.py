@@ -1,6 +1,12 @@
 from pypdf import PdfReader
 from langchain_text_splitters import RecursiveCharacterTextSplitter
-import ollama
+from ollama import Client
+
+
+# Docker container → host machine Ollama access
+client = Client(
+    host="http://host.docker.internal:11434"
+)
 
 
 def extract_text_from_pdf(file_path):
@@ -31,8 +37,6 @@ def chunk_text(text):
     return chunks
 
 
-
-
 def generate_answer(query, context_chunks):
 
     if not context_chunks:
@@ -41,34 +45,42 @@ def generate_answer(query, context_chunks):
     context = "\n\n".join(context_chunks)
 
     prompt = f"""
-    Answer the question using only the context below.
+Answer the question using only the context below.
 
-    Context:
-    {context}
+Context:
+{context}
 
-    Question:
-    {query}
-    """
+Question:
+{query}
+"""
 
-    stream = ollama.chat(
-        model="phi3",
-        messages=[
-            {
-                "role": "user",
-                "content": prompt
-            }
-        ],
-        stream=True
-    )
+    try:
 
-    final_response = ""
+        stream = client.chat(
+            model="phi3",
+            messages=[
+                {
+                    "role": "user",
+                    "content": prompt
+                }
+            ],
+            stream=True
+        )
 
-    for chunk in stream:
+        final_response = ""
 
-        content = chunk["message"]["content"]
+        for chunk in stream:
 
-        final_response += content
+            content = chunk["message"]["content"]
 
-        print(content, end="", flush=True)
+            final_response += content
 
-    return final_response
+            print(content, end="", flush=True)
+
+        return final_response
+
+    except Exception as e:
+
+        print("OLLAMA ERROR:", str(e))
+
+        return f"Error generating answer: {str(e)}"
