@@ -56,7 +56,7 @@ const SUGGESTED_QUERIES = [
 ];
 
 // const API_BASE = "http://localhost:8000";
-const API_BASE = "http://34.123.45.67:8000";
+const API_BASE = "http://34.174.113.55:8000";
 const STORAGE_KEY = "astraeus_guest_name";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
