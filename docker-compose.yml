@@ -1,0 +1,23 @@
+services:
+
+  backend:
+    build: ./backend
+    container_name: astraeus-backend
+    ports:
+      - "8000:8000"
+    depends_on:
+      - redis
+
+  frontend:
+    build: ./frontend
+    container_name: astraeus-frontend
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+  redis:
+    image: redis:latest
+    container_name: astraeus-redis
+    ports:
+      - "6379:6379"
