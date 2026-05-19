@@ -602,7 +602,7 @@ export default function ChatPage() {
                   ...msg,
                   content:
                     msg.content ||
-                    "Couldn't reach the backend. Make sure Astraeus is running on localhost:8000.",
+                    "Streaming failed. Check backend logs for the exact error.",
                   isLoading: false,
                   verification: { verified: false, confidence: 0 },
                   retrieved_chunks: [],
