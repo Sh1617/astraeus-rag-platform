@@ -103,25 +103,51 @@ async def stream_query(question: str, session_id: str):
 
     async def generate():
 
-        loop = asyncio.get_event_loop()
+        try:
 
-        # Run blocking graph invoke in thread
-        result = await loop.run_in_executor(
-            None,
-            lambda: app_graph.invoke({
-                "session_id": session_id,
-                "question": question,
-            })
-        )
+            print("=" * 50)
+            print("STREAM REQUEST RECEIVED")
+            print("QUESTION:", question)
+            print("SESSION:", session_id)
 
-        answer = result["answer"]
+            # Send initial chunk immediately
+            yield "Processing your request...\n\n"
 
-        # Stream word-by-word
-        for word in answer.split():
+            loop = asyncio.get_event_loop()
 
-            yield word + " "
+            # Run blocking graph safely
+            result = await loop.run_in_executor(
+                None,
+                lambda: app_graph.invoke({
+                    "session_id": session_id,
+                    "question": question,
+                })
+            )
 
-            await asyncio.sleep(0.03)
+            print("GRAPH INVOKE COMPLETED")
+
+            if not result:
+                yield "ERROR: No response generated"
+                return
+
+            answer = result.get("answer", "No answer generated")
+
+            print("ANSWER LENGTH:", len(answer))
+
+            # Stream word-by-word
+            for word in answer.split():
+
+                yield word + " "
+
+                await asyncio.sleep(0.03)
+
+            print("STREAM COMPLETED SUCCESSFULLY")
+
+        except Exception as e:
+
+            print("STREAM ERROR:", repr(e))
+
+            yield f"\n\nERROR: {str(e)}"
 
     return StreamingResponse(
         generate(),
